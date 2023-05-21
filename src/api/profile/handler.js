@@ -22,10 +22,13 @@ class UserProfileHandler {
     this.#validator.validatePostProfileBodyPayload({
       fullname, username, job, motto, email, expertise, experienceLevel, isMentor,
     });
-    this.#validator.validatePostProfileHeaderPayload(photoProfile.hapi.headers);
-    const isMentorBool = JSON.parse(isMentor);
+    let photoProfileUrl = null;
+    if (photoProfile) {
+      this.#validator.validatePostProfileHeaderPayload(photoProfile.hapi.headers);
+      photoProfileUrl = await this.#storageService.uploadFile(photoProfile, photoProfile.hapi);
+    }
 
-    const photoProfileUrl = await this.#storageService.uploadFile(photoProfile, photoProfile.hapi);
+    const isMentorBool = JSON.parse(isMentor);
     const userId = await this.#userProfileService.addUserProfile({
       id,
       photoProfileUrl,
