@@ -97,10 +97,11 @@ class UserProfileService {
           projection: {
             _id: 0,
             id: 1,
-            fullname: 1,
+            fullName: 1,
             username: 1,
             email: 1,
             photoProfileUrl: 1,
+            interests: 1,
             job: 1,
             experienceLevel: 1,
             expertise: 1,

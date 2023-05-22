@@ -16,12 +16,13 @@ class UserProfileHandler {
 
   async postUserProfileHandler(request, h) {
     const {
-      photoProfile, fullname, username, job, motto, email, experienceLevel,
+      photoProfile, fullName, username, job, motto, email, experienceLevel, interests,
     } = request.payload;
     const { id } = request.params;
     this.#validator.validatePostProfileBodyPayload({
-      fullname, username, job, motto, email, experienceLevel,
+      fullName, username, job, motto, email, experienceLevel, interests,
     });
+    const listOfInterests = interests.split(',');
     let photoProfileUrl = null;
     if (photoProfile) {
       this.#validator.validatePostProfileHeaderPayload(photoProfile.hapi.headers);
@@ -30,18 +31,19 @@ class UserProfileHandler {
     const userId = await this.#userProfileService.addUserProfile({
       id,
       photoProfileUrl,
-      fullname,
+      fullName,
       job,
       motto,
       username,
       email,
       experienceLevel,
+      interests: listOfInterests,
     });
     const response = h.response({
       status: 'success',
       message: 'user profile successfully added',
       data: {
-        userId,
+        id: userId,
       },
     });
     response.code(201);
