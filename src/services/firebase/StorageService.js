@@ -3,15 +3,6 @@ const {
   getStorage, ref, getDownloadURL, uploadBytesResumable,
 } = require('firebase/storage');
 
-/*
-API_KEY=AIzaSyCzAmonCFEZLVniL4kBrPhpaYhlKc2AcX0
-AUTH_DOMAIN=dicoding-mentoring-a593e.firebaseapp.com
-PROJECT_ID=dicoding-mentoring-a593e
-STORAGE_BUCKET=dicoding-mentoring-a593e.appspot.com
-MESSAGING_SENDER_ID=177840619572
-APP_ID=1:177840619572:web:85c1445ef8cac0de62ca61,
-MEASUREMENT_ID=G-BZSH6TQFSM
- */
 // Initialize Firebase Admin SDK
 class StorageService {
   #storage;

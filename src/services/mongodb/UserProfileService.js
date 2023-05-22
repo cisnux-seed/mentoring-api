@@ -8,6 +8,8 @@ class UserProfileService {
 
   #userProfiles;
 
+  #mentorProfiles;
+
   #client;
 
   constructor() {
@@ -17,12 +19,17 @@ class UserProfileService {
 
   async #connectDb() {
     try {
+      console.log(process.env.USER_PROFILES);
       await this.#client.connect();
       this.#db = this.#client.db(process.env.MONGODB_DATABASE_NAME);
-      this.#userProfiles = await this.#db.collection(process.env.USER_PROFILE);
+      this.#userProfiles = await this.#db.collection(process.env.USER_PROFILES);
+      this.#mentorProfiles = await this.#db.collection(process.env.MENTOR_PROFILES);
 
-      const result = await this.#userProfiles.createIndex({ id: 1, username: 1 }, { unique: true });
-      console.log(`Index created: ${result}`);
+      const resultIndexUser = await this.#userProfiles
+        .createIndex({ id: 1, username: 1 }, { unique: true });
+      const resultIndexMentor = await this.#mentorProfiles
+        .createIndex({ id: 1 }, { unique: true });
+      console.log(`Index created: ${resultIndexUser} ${resultIndexMentor}`);
     } catch (error) {
       console.error(error);
       throw error;
@@ -98,7 +105,6 @@ class UserProfileService {
             experienceLevel: 1,
             expertise: 1,
             motto: 1,
-            isMentor: 1,
           },
         },
       )
@@ -110,7 +116,34 @@ class UserProfileService {
       throw new NotFoundError('user profile not found');
     }
 
-    return userProfile;
+    const mentorProfile = await this.#mentorProfiles
+      .findOne(
+        { id },
+        {
+          projection: {
+            _id: 0,
+            rating: 1,
+            expertises: 1,
+            skills: 1,
+            isMentor: 1,
+          },
+        },
+      )
+      .catch((err) => {
+        console.error(err);
+      });
+
+    if (!mentorProfile) {
+      return {
+        ...userProfile,
+        rating: null,
+        expertises: null,
+        skills: null,
+        isMentor: false,
+      };
+    }
+
+    return { ...userProfile, ...mentorProfile };
   }
 }
 

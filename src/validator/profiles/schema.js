@@ -10,9 +10,7 @@ const PostProfileScheme = joi.object({
   email: joi.string().email({ tlds: true }).required(),
   job: joi.string().required(),
   experienceLevel: joi.string().required(),
-  isMentor: joi.boolean().required(),
   motto: joi.string(),
-  expertise: joi.string(),
 });
 
 module.exports = { PostProfileScheme, ImageHeaderSchema };

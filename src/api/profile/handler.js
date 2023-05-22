@@ -16,19 +16,17 @@ class UserProfileHandler {
 
   async postUserProfileHandler(request, h) {
     const {
-      photoProfile, fullname, username, job, motto, email, expertise, experienceLevel, isMentor,
+      photoProfile, fullname, username, job, motto, email, experienceLevel,
     } = request.payload;
     const { id } = request.params;
     this.#validator.validatePostProfileBodyPayload({
-      fullname, username, job, motto, email, expertise, experienceLevel, isMentor,
+      fullname, username, job, motto, email, experienceLevel,
     });
     let photoProfileUrl = null;
     if (photoProfile) {
       this.#validator.validatePostProfileHeaderPayload(photoProfile.hapi.headers);
       photoProfileUrl = await this.#storageService.uploadFile(photoProfile, photoProfile.hapi);
     }
-
-    const isMentorBool = JSON.parse(isMentor);
     const userId = await this.#userProfileService.addUserProfile({
       id,
       photoProfileUrl,
@@ -37,9 +35,7 @@ class UserProfileHandler {
       motto,
       username,
       email,
-      expertise,
       experienceLevel,
-      isMentor: isMentorBool,
     });
     const response = h.response({
       status: 'success',
