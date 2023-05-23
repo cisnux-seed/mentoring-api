@@ -18,6 +18,7 @@ class UserProfileHandler {
     const {
       photoProfile, fullName, username, job, motto, email, experienceLevel, interests,
     } = request.payload;
+    console.log(request.payload);
     const { id } = request.params;
     this.#validator.validatePostProfileBodyPayload({
       fullName, username, job, motto, email, experienceLevel, interests,
