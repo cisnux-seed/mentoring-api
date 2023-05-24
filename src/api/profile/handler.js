@@ -16,12 +16,11 @@ class UserProfileHandler {
 
   async postUserProfileHandler(request, h) {
     const {
-      photoProfile, fullName, username, job, motto, email, experienceLevel, interests,
+      photoProfile, fullName, username, job, about, email, experienceLevel, interests,
     } = request.payload;
-    console.log(request.payload);
     const { id } = request.params;
     this.#validator.validatePostProfileBodyPayload({
-      fullName, username, job, motto, email, experienceLevel, interests,
+      fullName, username, job, about, email, experienceLevel, interests,
     });
     const listOfInterests = interests.split(',');
     let photoProfileUrl = null;
@@ -34,7 +33,7 @@ class UserProfileHandler {
       photoProfileUrl,
       fullName,
       job,
-      motto,
+      about,
       username,
       email,
       experienceLevel,
