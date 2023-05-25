@@ -11,7 +11,7 @@ const PostProfileScheme = joi.object({
   job: joi.string().required(),
   experienceLevel: joi.string().required(),
   interests: joi.string().required(),
-  about: joi.string().required().min(80),
+  about: joi.string().required().max(80),
 });
 
 module.exports = { PostProfileScheme, ImageHeaderSchema };
