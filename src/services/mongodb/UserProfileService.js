@@ -105,7 +105,7 @@ class UserProfileService {
             job: 1,
             experienceLevel: 1,
             expertise: 1,
-            motto: 1,
+            about: 1,
           },
         },
       )
