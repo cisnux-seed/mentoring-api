@@ -104,7 +104,6 @@ class UserProfileService {
             interests: 1,
             job: 1,
             experienceLevel: 1,
-            expertise: 1,
             about: 1,
           },
         },
@@ -123,9 +122,6 @@ class UserProfileService {
         {
           projection: {
             _id: 0,
-            rating: 1,
-            expertises: 1,
-            skills: 1,
             isMentor: 1,
           },
         },
@@ -137,9 +133,6 @@ class UserProfileService {
     if (!mentorProfile) {
       return {
         ...userProfile,
-        rating: null,
-        expertises: null,
-        skills: null,
         isMentor: false,
       };
     }
