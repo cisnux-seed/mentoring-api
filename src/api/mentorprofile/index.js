@@ -1,15 +1,15 @@
-const UserProfileHandler = require('./handler');
+const MentorProfileHandler = require('./handler');
 const routes = require('./routes');
 
 module.exports = {
-  name: 'profile',
+  name: 'mentorprofile',
   version: '1.0.0',
   register: async (server, { userProfileService, storageService, validator }) => {
-    const userProfileHandler = new UserProfileHandler(
+    const mentorProfileHandler = new MentorProfileHandler(
       userProfileService,
       storageService,
       validator,
     );
-    server.route(routes(userProfileHandler));
+    server.route(routes(mentorProfileHandler));
   },
 };

@@ -1,4 +1,4 @@
-class UserProfileHandler {
+class MenteeProfileHandler {
   #userProfileService;
 
   #storageService;
@@ -10,25 +10,25 @@ class UserProfileHandler {
     this.#storageService = storageService;
     this.#validator = validator;
 
-    this.postUserProfileHandler = this.postUserProfileHandler.bind(this);
-    this.getUserProfileByIdHandler = this.getUserProfileByIdHandler.bind(this);
+    this.postMenteeProfileHandler = this.postMenteeProfileHandler.bind(this);
+    this.getMenteeProfileByIdHandler = this.getMenteeProfileByIdHandler.bind(this);
   }
 
-  async postUserProfileHandler(request, h) {
+  async postMenteeProfileHandler(request, h) {
     const {
       photoProfile, fullName, username, job, about, email, experienceLevel, interests,
     } = request.payload;
     const { id } = request.params;
-    this.#validator.validatePostProfileBodyPayload({
+    this.#validator.validatePostMenteeProfileBodyPayload({
       fullName, username, job, about, email, experienceLevel, interests,
     });
     const listOfInterests = interests.split(',');
     let photoProfileUrl = null;
     if (photoProfile) {
-      this.#validator.validatePostProfileHeaderPayload(photoProfile.hapi.headers);
+      this.#validator.validatePostMenteeProfileHeaderPayload(photoProfile.hapi.headers);
       photoProfileUrl = await this.#storageService.uploadFile(photoProfile, photoProfile.hapi);
     }
-    const userId = await this.#userProfileService.addUserProfile({
+    const userId = await this.#userProfileService.addMenteeProfile({
       id,
       photoProfileUrl,
       fullName,
@@ -41,7 +41,7 @@ class UserProfileHandler {
     });
     const response = h.response({
       status: 'success',
-      message: 'user profile successfully added',
+      message: 'mentee profile successfully added',
       data: {
         id: userId,
       },
@@ -50,9 +50,9 @@ class UserProfileHandler {
     return response;
   }
 
-  async getUserProfileByIdHandler(request, h) {
+  async getMenteeProfileByIdHandler(request, h) {
     const { id } = request.params;
-    const userProfile = await this.#userProfileService.getUserProfile({ id });
+    const userProfile = await this.#userProfileService.getMenteeProfile({ id });
     const response = h.response({
       status: 'success',
       data: {
@@ -64,4 +64,4 @@ class UserProfileHandler {
   }
 }
 
-module.exports = UserProfileHandler;
+module.exports = MenteeProfileHandler;

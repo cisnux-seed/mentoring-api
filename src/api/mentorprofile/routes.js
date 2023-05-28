@@ -1,8 +1,8 @@
 const routes = (handler) => [
   {
     method: 'POST',
-    path: '/profile/{id}',
-    handler: handler.postUserProfileHandler,
+    path: '/mentorprofile/{id}',
+    handler: handler.postMentorProfileHandler,
     options: {
       payload: {
         allow: 'multipart/form-data',
@@ -14,8 +14,8 @@ const routes = (handler) => [
   },
   {
     method: 'GET',
-    path: '/profile/{id}',
-    handler: handler.getUserProfileByIdHandler,
+    path: '/mentorprofile/{id}',
+    handler: handler.getMentorProfileByIdHandler,
   },
 ];
 

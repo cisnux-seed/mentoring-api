@@ -3,8 +3,10 @@ require('dotenv').config();
 const Hapi = require('@hapi/hapi');
 const Inert = require('@hapi/inert');
 
-// songs
-const profile = require('./api/profile');
+// mentee
+const menteeprofile = require('./api/menteeprofile');
+// mentor
+const mentorprofile = require('./api/mentorprofile');
 const UserProfileService = require('./services/mongodb/UserProfileService');
 const StorageService = require('./services/firebase/StorageService');
 const ProfileValidator = require('./validator/profiles');
@@ -35,7 +37,15 @@ const init = async () => {
 
   await server.register([
     {
-      plugin: profile,
+      plugin: menteeprofile,
+      options: {
+        userProfileService,
+        storageService,
+        validator: ProfileValidator,
+      },
+    },
+    {
+      plugin: mentorprofile,
       options: {
         userProfileService,
         storageService,

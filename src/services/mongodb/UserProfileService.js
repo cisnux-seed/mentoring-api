@@ -1,57 +1,58 @@
+const mongoose = require('mongoose');
 const ClientError = require('../../exceptions/ClientError');
 const NotFoundError = require('../../exceptions/NotFoundError');
 const InvariantError = require('../../exceptions/InvariantError');
-const MongoSingleton = require('./database/MongoSingleton');
+const MenteeProfile = require('./models/MenteeProfile');
+const MentorProfile = require('./models/MentorProfile');
 
 class UserProfileService {
-  #db;
-
-  #userProfiles;
+  #menteeProfiles;
 
   #mentorProfiles;
 
-  #client;
-
   constructor() {
-    this.#client = MongoSingleton.getClient();
+    this.#menteeProfiles = MenteeProfile;
+    this.#mentorProfiles = MentorProfile;
     this.#connectDb();
   }
 
   async #connectDb() {
     try {
-      console.log(process.env.USER_PROFILES);
-      await this.#client.connect();
-      this.#db = this.#client.db(process.env.MONGODB_DATABASE_NAME);
-      this.#userProfiles = await this.#db.collection(process.env.USER_PROFILES);
-      this.#mentorProfiles = await this.#db.collection(process.env.MENTOR_PROFILES);
-
-      const resultIndexUser = await this.#userProfiles
-        .createIndex({ id: 1, username: 1 }, { unique: true });
-      const resultIndexMentor = await this.#mentorProfiles
-        .createIndex({ id: 1 }, { unique: true });
-      console.log(`Index created: ${resultIndexUser} ${resultIndexMentor}`);
+      await mongoose.connect(`${process.env.MONGODB_URI}/${process.env.MONGODB_DATABASE_NAME}`);
     } catch (error) {
       console.error(error);
       throw error;
     }
   }
 
-  async addUserProfile(payload) {
+  async addMenteeProfile(payload) {
     const { username, id } = payload;
 
-    const isIdExist = await this.#userProfiles
+    const isIdExist = await this.#menteeProfiles
+      .collection
       .findOne(
         { id },
-        { projection: { _id: 0, id: 1 } },
+        {
+          projection: {
+            _id: 0,
+            id: 1,
+          },
+        },
       )
       .catch((err) => {
         console.error(err);
       });
 
-    const isUsernameExist = await this.#userProfiles
+    const isUsernameExist = await this.#menteeProfiles
+      .collection
       .findOne(
         { username },
-        { projection: { _id: 0, username: 1 } },
+        {
+          projection: {
+            _id: 0,
+            username: 1,
+          },
+        },
       )
       .catch((err) => {
         console.error(err);
@@ -65,32 +66,91 @@ class UserProfileService {
       throw new ClientError('username already exists');
     }
 
-    const userProfile = await this.#userProfiles
+    const mentee = await this.#menteeProfiles
+      .collection
       .insertOne(payload)
       .catch((err) => {
         console.error(err);
       });
 
-    const { id: userId } = await this.#userProfiles
+    const { id: menteeId } = await this.#menteeProfiles
+      .collection
       .findOne(
-        { _id: userProfile.insertedId },
-        { projection: { _id: 0, id: 1 } },
+        { _id: mentee.insertedId },
+        {
+          projection: {
+            _id: 0,
+            id: 1,
+          },
+        },
       )
       .catch((err) => {
         console.error(err);
       });
 
-    if (!userId) {
-      throw new InvariantError('failed to add user profile');
+    if (!menteeId) {
+      throw new InvariantError('failed to add mentee profile');
     }
 
-    return userId;
+    return menteeId;
   }
 
-  async getUserProfile(payload) {
+  async addMentorProfile(payload) {
     const { id } = payload;
 
-    const userProfile = await this.#userProfiles
+    const isIdExist = await this.#mentorProfiles
+      .collection
+      .findOne(
+        { id },
+        {
+          projection: {
+            _id: 0,
+            id: 1,
+          },
+        },
+      )
+      .catch((err) => {
+        console.error(err);
+      });
+
+    if (isIdExist) {
+      throw new ClientError('id already exists');
+    }
+
+    const mentor = await this.#mentorProfiles
+      .collection
+      .insertOne(payload)
+      .catch((err) => {
+        console.error(err);
+      });
+
+    const { id: mentorId } = await this.#mentorProfiles
+      .collection
+      .findOne(
+        { _id: mentor.insertedId },
+        {
+          projection: {
+            _id: 0,
+            id: 1,
+          },
+        },
+      )
+      .catch((err) => {
+        console.error(err);
+      });
+
+    if (!mentorId) {
+      throw new InvariantError('failed to add mentor profile');
+    }
+
+    return mentorId;
+  }
+
+  async getMenteeProfile(payload) {
+    const { id } = payload;
+
+    const menteeProfile = await this.#menteeProfiles
+      .collection
       .findOne(
         { id },
         {
@@ -99,11 +159,11 @@ class UserProfileService {
             id: 1,
             fullName: 1,
             username: 1,
-            email: 1,
             photoProfileUrl: 1,
-            interests: 1,
+            email: 1,
             job: 1,
             experienceLevel: 1,
+            interests: 1,
             about: 1,
           },
         },
@@ -112,11 +172,12 @@ class UserProfileService {
         console.error(err);
       });
 
-    if (!userProfile) {
-      throw new NotFoundError('user profile not found');
+    if (!menteeProfile) {
+      throw new NotFoundError('mentee profile not found');
     }
 
     const mentorProfile = await this.#mentorProfiles
+      .collection
       .findOne(
         { id },
         {
@@ -132,12 +193,39 @@ class UserProfileService {
 
     if (!mentorProfile) {
       return {
-        ...userProfile,
+        ...menteeProfile,
         isMentor: false,
       };
     }
 
-    return { ...userProfile, ...mentorProfile };
+    return { ...menteeProfile, ...mentorProfile };
+  }
+
+  async getMentorProfile(payload) {
+    const { id } = payload;
+
+    const mentorProfile = await this.#mentorProfiles
+      .collection
+      .findOne(
+        { id },
+        {
+          projection: {
+            _id: 0,
+            id: 1,
+            skills: 1,
+            certificateUrl: 1,
+          },
+        },
+      )
+      .catch((err) => {
+        console.error(err);
+      });
+
+    if (!mentorProfile) {
+      throw new NotFoundError('mentor profile not found');
+    }
+
+    return mentorProfile;
   }
 }
 
