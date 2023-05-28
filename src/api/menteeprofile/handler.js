@@ -24,6 +24,7 @@ class MenteeProfileHandler {
     });
     const listOfInterests = interests.split(',');
     let photoProfileUrl = null;
+    await this.#userProfileService.isMenteeProfileExist({ id, username });
     if (photoProfile) {
       this.#validator.validatePostMenteeProfileHeaderPayload(photoProfile.hapi.headers);
       photoProfileUrl = await this.#storageService.uploadFile(photoProfile, photoProfile.hapi);

@@ -1,7 +1,7 @@
 const routes = (handler) => [
   {
     method: 'POST',
-    path: '/menteeprofile/{id}',
+    path: '/mentee/{id}',
     handler: handler.postMenteeProfileHandler,
     options: {
       payload: {
@@ -14,7 +14,7 @@ const routes = (handler) => [
   },
   {
     method: 'GET',
-    path: '/menteeprofile/{id}',
+    path: '/mentee/{id}',
     handler: handler.getMenteeProfileByIdHandler,
   },
 ];

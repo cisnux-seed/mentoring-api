@@ -26,46 +26,6 @@ class UserProfileService {
   }
 
   async addMenteeProfile(payload) {
-    const { username, id } = payload;
-
-    const isIdExist = await this.#menteeProfiles
-      .collection
-      .findOne(
-        { id },
-        {
-          projection: {
-            _id: 0,
-            id: 1,
-          },
-        },
-      )
-      .catch((err) => {
-        console.error(err);
-      });
-
-    const isUsernameExist = await this.#menteeProfiles
-      .collection
-      .findOne(
-        { username },
-        {
-          projection: {
-            _id: 0,
-            username: 1,
-          },
-        },
-      )
-      .catch((err) => {
-        console.error(err);
-      });
-
-    if (isIdExist) {
-      throw new ClientError('id already exists');
-    }
-
-    if (isUsernameExist) {
-      throw new ClientError('username already exists');
-    }
-
     const mentee = await this.#menteeProfiles
       .collection
       .insertOne(payload)
@@ -96,27 +56,6 @@ class UserProfileService {
   }
 
   async addMentorProfile(payload) {
-    const { id } = payload;
-
-    const isIdExist = await this.#mentorProfiles
-      .collection
-      .findOne(
-        { id },
-        {
-          projection: {
-            _id: 0,
-            id: 1,
-          },
-        },
-      )
-      .catch((err) => {
-        console.error(err);
-      });
-
-    if (isIdExist) {
-      throw new ClientError('id already exists');
-    }
-
     const mentor = await this.#mentorProfiles
       .collection
       .insertOne(payload)
@@ -226,6 +165,71 @@ class UserProfileService {
     }
 
     return mentorProfile;
+  }
+
+  async isMenteeProfileExist(payload) {
+    const { id, username } = payload;
+
+    const isIdExist = await this.#menteeProfiles
+      .collection
+      .findOne(
+        { id },
+        {
+          projection: {
+            _id: 0,
+            id: 1,
+          },
+        },
+      )
+      .catch((err) => {
+        console.error(err);
+      });
+
+    const isUsernameExist = await this.#menteeProfiles
+      .collection
+      .findOne(
+        { username },
+        {
+          projection: {
+            _id: 0,
+            username: 1,
+          },
+        },
+      )
+      .catch((err) => {
+        console.error(err);
+      });
+
+    if (isIdExist) {
+      throw new ClientError('id already exists');
+    }
+
+    if (isUsernameExist) {
+      throw new ClientError('username already exists');
+    }
+  }
+
+  async isMentorProfileExist(payload) {
+    const { id } = payload;
+
+    const isIdExist = await this.#mentorProfiles
+      .collection
+      .findOne(
+        { id },
+        {
+          projection: {
+            _id: 0,
+            id: 1,
+          },
+        },
+      )
+      .catch((err) => {
+        console.error(err);
+      });
+
+    if (isIdExist) {
+      throw new ClientError('id already exists');
+    }
   }
 }
 

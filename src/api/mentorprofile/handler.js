@@ -25,6 +25,7 @@ class MentorProfileHandler {
     });
     this.#validator.validatePostMentorProfileHeaderPayload(certificate.hapi.headers);
     const listOfSkills = skills.split(',');
+    await this.#userProfileService.isMentorProfileExist({ id });
     const certificateUrl = await this.#storageService.uploadFile(certificate, certificate.hapi);
     const isMentor = true;
     const userId = await this.#userProfileService.addMentorProfile({
