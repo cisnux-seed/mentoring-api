@@ -153,6 +153,7 @@ class UserProfileService {
             id: 1,
             skills: 1,
             certificateUrl: 1,
+            learningPaths: 1,
           },
         },
       )
@@ -230,6 +231,47 @@ class UserProfileService {
     if (isIdExist) {
       throw new ClientError('id already exists');
     }
+  }
+
+  async getMentors(learningPath) {
+    const filter = !learningPath
+      ? { isMentor: true }
+      : { isMentor: true, learningPaths: learningPath };
+
+    const mentorCursor = await this.#mentorProfiles
+      .collection
+      .find(filter, {
+        projection: {
+          id: 1,
+          _id: 0,
+        },
+      });
+
+    const mentors = await mentorCursor.toArray().catch((err) => {
+      console.error(err);
+    });
+
+    const mentorProfiles = await Promise.all(mentors.map(async (mentor) => {
+      const profile = await this.#menteeProfiles
+        .collection
+        .findOne(
+          { id: mentor.id },
+          {
+            projection: {
+              _id: 0,
+              id: 1,
+              fullName: 1,
+              photoProfileUrl: 1,
+              job: 1,
+            },
+          },
+        )
+        .catch((err) => {
+          console.error(err);
+        });
+      return profile;
+    }));
+    return mentorProfiles;
   }
 }
 

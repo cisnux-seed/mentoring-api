@@ -12,18 +12,21 @@ class MentorProfileHandler {
 
     this.postMentorProfileHandler = this.postMentorProfileHandler.bind(this);
     this.getMentorProfileByIdHandler = this.getMentorProfileByIdHandler.bind(this);
+    this.getMentorsHandler = this.getMentorsHandler.bind(this);
   }
 
   async postMentorProfileHandler(request, h) {
     const {
-      skills, certificate,
+      learningPaths, skills, certificate,
     } = request.payload;
     const { id } = request.params;
+    this.#validator.validatePostMentorProfileHeaderPayload(certificate.hapi.headers);
     this.#validator.validatePostMentorProfileBodyPayload({
       skills,
       certificate,
+      learningPaths,
     });
-    this.#validator.validatePostMentorProfileHeaderPayload(certificate.hapi.headers);
+    const listOfLearningPaths = learningPaths.split(',');
     const listOfSkills = skills.split(',');
     await this.#userProfileService.isMentorProfileExist({ id });
     const certificateUrl = await this.#storageService.uploadFile(certificate, certificate.hapi);
@@ -31,6 +34,7 @@ class MentorProfileHandler {
     const userId = await this.#userProfileService.addMentorProfile({
       id,
       skills: listOfSkills,
+      learningPaths: listOfLearningPaths,
       certificateUrl,
       isMentor,
     });
@@ -56,6 +60,17 @@ class MentorProfileHandler {
     });
     response.code(200);
     return response;
+  }
+
+  async getMentorsHandler(request) {
+    const { learningPath } = request.query;
+    const mentors = await this.#userProfileService.getMentors(learningPath);
+    return {
+      status: 'success',
+      data: {
+        mentors,
+      },
+    };
   }
 }
 

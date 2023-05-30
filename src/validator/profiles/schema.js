@@ -21,6 +21,7 @@ const PostMenteeProfile = joi.object({
 const PostMentorProfile = joi.object({
   certificate: joi.required(),
   skills: joi.string().required(),
+  learningPaths: joi.string().required(),
 });
 
 module.exports = {

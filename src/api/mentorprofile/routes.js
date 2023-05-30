@@ -1,7 +1,7 @@
 const routes = (handler) => [
   {
     method: 'POST',
-    path: '/mentor/{id}',
+    path: '/mentors/{id}',
     handler: handler.postMentorProfileHandler,
     options: {
       payload: {
@@ -14,8 +14,13 @@ const routes = (handler) => [
   },
   {
     method: 'GET',
-    path: '/mentor/{id}',
+    path: '/mentors/{id}',
     handler: handler.getMentorProfileByIdHandler,
+  },
+  {
+    method: 'GET',
+    path: '/mentors',
+    handler: handler.getMentorsHandler,
   },
 ];
 
