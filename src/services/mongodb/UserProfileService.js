@@ -135,7 +135,7 @@ class UserProfileService {
     if (!mentorProfile) {
       return {
         ...menteeProfile,
-        isMentor: false,
+        isMentorValid: false,
       };
     }
     return { ...menteeProfile, ...mentorProfile };
