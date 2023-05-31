@@ -9,7 +9,7 @@ const PostMenteeProfile = joi.object({
   username: joi.string().required(),
   email: joi.string().email({ tlds: true }).required(),
   job: joi.string().required(),
-  about: joi.string().required().max(160),
+  about: joi.string().required().max(161),
 });
 
 const PostMentorProfile = joi.object({
