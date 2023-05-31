@@ -18,7 +18,13 @@ class UserProfileService {
 
   async #connectDb() {
     try {
-      await mongoose.connect(`${process.env.MONGODB_URI}/${process.env.MONGODB_DATABASE_NAME}`);
+      await mongoose.connect(
+        `${process.env.MONGODB_URI}/${process.env.MONGODB_DATABASE_NAME}`,
+        {
+          autoIndex: true,
+          autoCreate: true,
+        },
+      );
     } catch (error) {
       console.error(error);
       throw error;
@@ -51,7 +57,6 @@ class UserProfileService {
     if (!menteeId) {
       throw new InvariantError('failed to add mentee profile');
     }
-
     return menteeId;
   }
 
@@ -81,7 +86,6 @@ class UserProfileService {
     if (!mentorId) {
       throw new InvariantError('failed to add mentor profile');
     }
-
     return mentorId;
   }
 
@@ -101,8 +105,6 @@ class UserProfileService {
             photoProfileUrl: 1,
             email: 1,
             job: 1,
-            experienceLevel: 1,
-            interests: 1,
             about: 1,
           },
         },
@@ -122,7 +124,7 @@ class UserProfileService {
         {
           projection: {
             _id: 0,
-            isMentor: 1,
+            isMentorValid: 1,
           },
         },
       )
@@ -136,7 +138,6 @@ class UserProfileService {
         isMentor: false,
       };
     }
-
     return { ...menteeProfile, ...mentorProfile };
   }
 
@@ -151,9 +152,7 @@ class UserProfileService {
           projection: {
             _id: 0,
             id: 1,
-            skills: 1,
-            certificateUrl: 1,
-            learningPaths: 1,
+            expertises: 1,
           },
         },
       )
@@ -164,7 +163,6 @@ class UserProfileService {
     if (!mentorProfile) {
       throw new NotFoundError('mentor profile not found');
     }
-
     return mentorProfile;
   }
 
@@ -234,18 +232,21 @@ class UserProfileService {
   }
 
   async getMentors(learningPath) {
-    const filter = !learningPath
-      ? { isMentor: true }
-      : { isMentor: true, learningPaths: learningPath };
-
-    const mentorCursor = await this.#mentorProfiles
-      .collection
-      .find(filter, {
-        projection: {
-          id: 1,
-          _id: 0,
-        },
-      });
+    let mentorCursor = null;
+    if (!learningPath) {
+      mentorCursor = await this.#mentorProfiles
+        .collection
+        .find({ isMentorValid: true }, {
+          projection: {
+            id: 1,
+            _id: 0,
+          },
+        });
+    } else {
+      mentorCursor = await this.#mentorProfiles
+        .collection
+        .find({ $text: { $search: learningPath, $caseSensitive: false } });
+    }
 
     const mentors = await mentorCursor.toArray().catch((err) => {
       console.error(err);
@@ -269,6 +270,7 @@ class UserProfileService {
         .catch((err) => {
           console.error(err);
         });
+
       return profile;
     }));
     return mentorProfiles;

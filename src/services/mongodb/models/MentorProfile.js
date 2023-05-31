@@ -2,11 +2,16 @@ const { Schema, model } = require('mongoose');
 
 const mentorProfileSchema = new Schema({
   id: { type: String, required: true, index: { unique: true } },
-  skills: { type: Array, required: true },
-  learningPaths: { type: Array, required: true, index: true },
-  certificateUrl: { type: String, required: true },
-  isMentor: { type: Boolean, required: true },
+  expertises: [
+    {
+      learningPath: { type: String, required: true },
+      experienceLevel: { type: String, required: true },
+      skills: { type: Array, required: true },
+      certificates: { type: Array, required: true },
+    },
+  ],
 });
+mentorProfileSchema.index({ 'expertises.learningPath': 'text', 'expertises.experienceLevel': 'text', 'expertises.skills': 'text' });
 
 const MentorProfile = model('MentorProfile', mentorProfileSchema);
 

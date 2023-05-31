@@ -17,26 +17,30 @@ class MentorProfileHandler {
 
   async postMentorProfileHandler(request, h) {
     const {
-      learningPaths, skills, certificate,
+      expertises,
     } = request.payload;
     const { id } = request.params;
-    this.#validator.validatePostMentorProfileHeaderPayload(certificate.hapi.headers);
-    this.#validator.validatePostMentorProfileBodyPayload({
-      skills,
-      certificate,
-      learningPaths,
+    console.log(expertises);
+    this.#validator.validatePostMentorProfilePayload({ expertises });
+    expertises.forEach((expertise) => {
+      const {
+        learningPath, experienceLevel, skills, certificates,
+      } = expertise;
+      console.log(expertise);
+
+      this.#validator.validateExpertisePayload({
+        learningPath,
+        experienceLevel,
+        skills,
+        certificates,
+      });
     });
-    const listOfLearningPaths = learningPaths.split(',');
-    const listOfSkills = skills.split(',');
     await this.#userProfileService.isMentorProfileExist({ id });
-    const certificateUrl = await this.#storageService.uploadFile(certificate, certificate.hapi);
-    const isMentor = true;
+    const isMentorValid = true;
     const userId = await this.#userProfileService.addMentorProfile({
       id,
-      skills: listOfSkills,
-      learningPaths: listOfLearningPaths,
-      certificateUrl,
-      isMentor,
+      isMentorValid,
+      expertises,
     });
     const response = h.response({
       status: 'success',

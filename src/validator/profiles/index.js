@@ -1,6 +1,6 @@
 const InvariantError = require('../../exceptions/InvariantError');
 const {
-  PostMenteeProfile, ImageHeaderSchema, FileHeaderSchema, PostMentorProfile,
+  PostMenteeProfile, ImageHeaderSchema, PostMentorProfile, Expertise,
 } = require('./schema');
 
 const ProfileValidator = {
@@ -16,16 +16,16 @@ const ProfileValidator = {
       throw new InvariantError(validationHeaderResult.error.message, 'fail');
     }
   },
-  validatePostMentorProfileBodyPayload: (payload) => {
+  validatePostMentorProfilePayload: (payload) => {
     const validationBodyResult = PostMentorProfile.validate(payload);
     if (validationBodyResult.error) {
       throw new InvariantError(validationBodyResult.error.message, 'fail');
     }
   },
-  validatePostMentorProfileHeaderPayload: (payload) => {
-    const validationHeaderResult = FileHeaderSchema.validate(payload);
-    if (validationHeaderResult.error) {
-      throw new InvariantError(validationHeaderResult.error.message, 'fail');
+  validateExpertisePayload: (payload) => {
+    const validationResult = Expertise.validate(payload);
+    if (validationResult.error) {
+      throw new InvariantError(validationResult.error.message, 'fail');
     }
   },
 };

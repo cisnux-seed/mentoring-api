@@ -16,13 +16,12 @@ class MenteeProfileHandler {
 
   async postMenteeProfileHandler(request, h) {
     const {
-      photoProfile, fullName, username, job, about, email, experienceLevel, interests,
+      photoProfile, fullName, username, job, about, email,
     } = request.payload;
     const { id } = request.params;
     this.#validator.validatePostMenteeProfileBodyPayload({
-      fullName, username, job, about, email, experienceLevel, interests,
+      fullName, username, job, about, email,
     });
-    const listOfInterests = interests.split(',');
     let photoProfileUrl = null;
     await this.#userProfileService.isMenteeProfileExist({ id, username });
     if (photoProfile) {
@@ -37,8 +36,6 @@ class MenteeProfileHandler {
       about,
       username,
       email,
-      experienceLevel,
-      interests: listOfInterests,
     });
     const response = h.response({
       status: 'success',
