@@ -108,9 +108,9 @@ class MentorService {
     }
   }
 
-  async getMentors(query) {
+  async getMentors(keyword) {
     let mentorCursor = null;
-    if (!query) {
+    if (!keyword) {
       mentorCursor = await this.#mentor
         .collection
         .find({ isMentorValid: true }, {
@@ -122,7 +122,7 @@ class MentorService {
     } else {
       mentorCursor = await this.#mentor
         .collection
-        .find({ $text: { $search: query, $caseSensitive: false } });
+        .find({ $text: { $search: keyword, $caseSensitive: false } });
     }
 
     const mentors = await mentorCursor.toArray().catch((err) => {

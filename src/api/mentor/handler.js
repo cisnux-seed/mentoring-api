@@ -28,7 +28,6 @@ class MentorHandler {
       expertises,
     } = request.payload;
     const { id } = request.params;
-    console.log(expertises);
     this.#validator.validatePostMentorPayload({ expertises });
     expertises.forEach((expertise) => {
       const {
@@ -75,8 +74,8 @@ class MentorHandler {
   }
 
   async getMentorsHandler(request) {
-    const { learningPath } = request.query;
-    const mentors = await this.#mentorService.getMentors(learningPath);
+    const { keyword } = request.query;
+    const mentors = await this.#mentorService.getMentors(keyword);
     const mentorWithProfiles = await Promise.all(mentors.map(async (mentor) => {
       const profile = await this.#menteeService.getMenteeProfileAsMentor({
         id: mentor.id,
