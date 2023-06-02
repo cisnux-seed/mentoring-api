@@ -1,16 +1,15 @@
 const { Schema, model } = require('mongoose');
 
-const menteeProfileSchema = new Schema({
+const menteeSchema = new Schema({
   id: { type: String, required: true, index: { unique: true } },
   fullName: { type: String, required: true },
   username: { type: String, required: true, index: { unique: true } },
   email: { type: String, required: true },
   job: { type: String, required: true },
-  experienceLevel: { type: String, required: true },
-  interests: { type: Array, required: true },
   about: { type: String, required: true },
 });
+menteeSchema.index({ job: 'text' });
 
-const MenteeProfile = model('MenteeProfile', menteeProfileSchema);
+const Mentee = model('Mentee', menteeSchema);
 
-module.exports = MenteeProfile;
+module.exports = Mentee;

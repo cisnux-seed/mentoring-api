@@ -1,6 +1,6 @@
 const { Schema, model } = require('mongoose');
 
-const mentorProfileSchema = new Schema({
+const mentorSchema = new Schema({
   id: { type: String, required: true, index: { unique: true } },
   expertises: [
     {
@@ -11,8 +11,8 @@ const mentorProfileSchema = new Schema({
     },
   ],
 });
-mentorProfileSchema.index({ 'expertises.learningPath': 'text', 'expertises.experienceLevel': 'text', 'expertises.skills': 'text' });
+mentorSchema.index({ 'expertises.learningPath': 'text', 'expertises.experienceLevel': 'text', 'expertises.skills': 'text' });
 
-const MentorProfile = model('MentorProfile', mentorProfileSchema);
+const Mentor = model('Mentor', mentorSchema);
 
-module.exports = MentorProfile;
+module.exports = Mentor;

@@ -2,7 +2,7 @@ const routes = (handler) => [
   {
     method: 'POST',
     path: '/mentees/{id}',
-    handler: handler.postMenteeProfileHandler,
+    handler: handler.postMenteeHandler,
     options: {
       payload: {
         allow: 'multipart/form-data',

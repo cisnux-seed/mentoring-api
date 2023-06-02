@@ -2,7 +2,7 @@ const routes = (handler) => [
   {
     method: 'POST',
     path: '/mentors/{id}',
-    handler: handler.postMentorProfileHandler,
+    handler: handler.postMentorHandler,
   },
   {
     method: 'GET',

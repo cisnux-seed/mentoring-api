@@ -1,27 +1,35 @@
-class MentorProfileHandler {
-  #userProfileService;
+class MentorHandler {
+  #mentorService;
 
-  #storageService;
+  #menteeService;
+
+  #reviewService;
 
   #validator;
 
-  constructor(userProfileService, storageService, validator) {
-    this.#userProfileService = userProfileService;
-    this.#storageService = storageService;
+  constructor(
+    mentorService,
+    menteeService,
+    reviewService,
+    validator,
+  ) {
+    this.#mentorService = mentorService;
+    this.#menteeService = menteeService;
+    this.#reviewService = reviewService;
     this.#validator = validator;
 
-    this.postMentorProfileHandler = this.postMentorProfileHandler.bind(this);
+    this.postMentorHandler = this.postMentorHandler.bind(this);
     this.getMentorProfileByIdHandler = this.getMentorProfileByIdHandler.bind(this);
     this.getMentorsHandler = this.getMentorsHandler.bind(this);
   }
 
-  async postMentorProfileHandler(request, h) {
+  async postMentorHandler(request, h) {
     const {
       expertises,
     } = request.payload;
     const { id } = request.params;
     console.log(expertises);
-    this.#validator.validatePostMentorProfilePayload({ expertises });
+    this.#validator.validatePostMentorPayload({ expertises });
     expertises.forEach((expertise) => {
       const {
         learningPath, experienceLevel, skills, certificates,
@@ -35,9 +43,9 @@ class MentorProfileHandler {
         certificates,
       });
     });
-    await this.#userProfileService.isMentorProfileExist({ id });
+    await this.#mentorService.isMentorProfileExist({ id });
     const isMentorValid = true;
-    const userId = await this.#userProfileService.addMentorProfile({
+    const userId = await this.#mentorService.addMentor({
       id,
       isMentorValid,
       expertises,
@@ -55,7 +63,7 @@ class MentorProfileHandler {
 
   async getMentorProfileByIdHandler(request, h) {
     const { id } = request.params;
-    const mentorProfile = await this.#userProfileService.getMentorProfile({ id });
+    const mentorProfile = await this.#mentorService.getMentorProfile({ id });
     const response = h.response({
       status: 'success',
       data: {
@@ -68,14 +76,21 @@ class MentorProfileHandler {
 
   async getMentorsHandler(request) {
     const { learningPath } = request.query;
-    const mentors = await this.#userProfileService.getMentors(learningPath);
+    const mentors = await this.#mentorService.getMentors(learningPath);
+    const mentorWithProfiles = await Promise.all(mentors.map(async (mentor) => {
+      const profile = await this.#menteeService.getMenteeProfileAsMentor({
+        id: mentor.id,
+      });
+      const averageRating = await this.#reviewService.getReviewsRatingById({ mentorId: mentor.id });
+      return { ...profile, averageRating };
+    }));
     return {
       status: 'success',
       data: {
-        mentors,
+        mentors: mentorWithProfiles,
       },
     };
   }
 }
 
-module.exports = MentorProfileHandler;
+module.exports = MentorHandler;

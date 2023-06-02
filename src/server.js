@@ -4,19 +4,27 @@ const Hapi = require('@hapi/hapi');
 const Inert = require('@hapi/inert');
 
 // mentee
-const menteeprofile = require('./api/menteeprofile');
+const mentee = require('./api/mentee');
+const MenteeService = require('./services/mongodb/MenteeService');
+const MenteeValidator = require('./validator/mentee');
 // mentor
-const mentorprofile = require('./api/mentorprofile');
-const UserProfileService = require('./services/mongodb/UserProfileService');
+const mentor = require('./api/mentor');
+const MentorService = require('./services/mongodb/MentorService');
+const MentorValidator = require('./validator/mentor');
+// storage service
 const StorageService = require('./services/firebase/StorageService');
-const ProfileValidator = require('./validator/profiles');
-
+// review
+const review = require('./api/review');
+const ReviewValidator = require('./validator/review');
+const ReviewService = require('./services/mongodb/ReviewService');
 // costom exceptions
 const ClientError = require('./exceptions/ClientError');
 const ServerError = require('./exceptions/ServerError');
 
 const init = async () => {
-  const userProfileService = new UserProfileService();
+  const menteeService = new MenteeService();
+  const mentorService = new MentorService();
+  const reviewService = new ReviewService();
   const storageService = new StorageService();
 
   const server = Hapi.server({
@@ -37,19 +45,29 @@ const init = async () => {
 
   await server.register([
     {
-      plugin: menteeprofile,
+      plugin: mentee,
       options: {
-        userProfileService,
+        menteeService,
+        mentorService,
         storageService,
-        validator: ProfileValidator,
+        validator: MenteeValidator,
       },
     },
     {
-      plugin: mentorprofile,
+      plugin: mentor,
       options: {
-        userProfileService,
-        storageService,
-        validator: ProfileValidator,
+        mentorService,
+        menteeService,
+        reviewService,
+        validator: MentorValidator,
+      },
+    },
+    {
+      plugin: review,
+      options: {
+        reviewService,
+        menteeService,
+        validator: ReviewValidator,
       },
     },
   ]);

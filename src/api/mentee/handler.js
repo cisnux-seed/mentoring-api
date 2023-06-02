@@ -1,34 +1,37 @@
-class MenteeProfileHandler {
-  #userProfileService;
+class MenteeHandler {
+  #menteeService;
 
   #storageService;
 
   #validator;
 
-  constructor(userProfileService, storageService, validator) {
-    this.#userProfileService = userProfileService;
+  #mentorSerivce;
+
+  constructor(menteeService, mentorService, storageService, validator) {
+    this.#menteeService = menteeService;
     this.#storageService = storageService;
     this.#validator = validator;
+    this.#mentorSerivce = mentorService;
 
-    this.postMenteeProfileHandler = this.postMenteeProfileHandler.bind(this);
+    this.postMenteeHandler = this.postMenteeHandler.bind(this);
     this.getMenteeProfileByIdHandler = this.getMenteeProfileByIdHandler.bind(this);
   }
 
-  async postMenteeProfileHandler(request, h) {
+  async postMenteeHandler(request, h) {
     const {
       photoProfile, fullName, username, job, about, email,
     } = request.payload;
     const { id } = request.params;
-    this.#validator.validatePostMenteeProfileBodyPayload({
+    this.#validator.validatePostMenteeBodyPayload({
       fullName, username, job, about, email,
     });
     let photoProfileUrl = null;
-    await this.#userProfileService.isMenteeProfileExist({ id, username });
+    await this.#menteeService.isMenteeProfileExist({ id, username });
     if (photoProfile) {
-      this.#validator.validatePostMenteeProfileHeaderPayload(photoProfile.hapi.headers);
+      this.#validator.validatePostMenteeHeaderPayload(photoProfile.hapi.headers);
       photoProfileUrl = await this.#storageService.uploadFile(photoProfile, photoProfile.hapi);
     }
-    const userId = await this.#userProfileService.addMenteeProfile({
+    const userId = await this.#menteeService.addMenteeProfile({
       id,
       photoProfileUrl,
       fullName,
@@ -50,11 +53,13 @@ class MenteeProfileHandler {
 
   async getMenteeProfileByIdHandler(request, h) {
     const { id } = request.params;
-    const userProfile = await this.#userProfileService.getMenteeProfile({ id });
+    const menteeProfile = await this.#menteeService.getMenteeProfile({ id });
+    const mentorProfile = await this.#mentorSerivce.getMentorProfile({ id });
     const response = h.response({
       status: 'success',
       data: {
-        ...userProfile,
+        ...menteeProfile,
+        isMentorValid: mentorProfile.isMentorValid,
       },
     });
     response.code(200);
@@ -62,4 +67,4 @@ class MenteeProfileHandler {
   }
 }
 
-module.exports = MenteeProfileHandler;
+module.exports = MenteeHandler;
