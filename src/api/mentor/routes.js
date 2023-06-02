@@ -11,7 +11,7 @@ const routes = (handler) => [
   },
   {
     method: 'GET',
-    path: '/mentors',
+    path: '/mentors/list/{id}',
     handler: handler.getMentorsHandler,
   },
 ];

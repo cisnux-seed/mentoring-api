@@ -74,8 +74,12 @@ class MentorHandler {
   }
 
   async getMentorsHandler(request) {
+    const { id } = request.params;
     const { keyword } = request.query;
-    const mentors = await this.#mentorService.getMentors(keyword);
+    const mentors = await this.#mentorService.getMentors({
+      id,
+      keyword,
+    });
     const mentorWithProfiles = await Promise.all(mentors.map(async (mentor) => {
       const profile = await this.#menteeService.getMenteeProfileAsMentor({
         id: mentor.id,
