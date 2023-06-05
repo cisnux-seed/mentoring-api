@@ -33,7 +33,7 @@ class MenteeHandler {
     }
     const userId = await this.#menteeService.addMenteeProfile({
       id,
-      photoProfileUrl,
+      photoProfile: photoProfileUrl,
       fullName,
       job,
       about,
